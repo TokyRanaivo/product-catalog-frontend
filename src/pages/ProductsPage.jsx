@@ -1,4 +1,4 @@
-// src/pages/ProductsPage.jsx
+// src/pages/ProductsPage.jsx - Fixed version for form interaction issues
 import { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
@@ -16,13 +16,11 @@ import {
   Alert,
   LoadingContainer,
   Spinner,
-  Button,
-  PageTitle,
-  ActionButtonContainer
+  Button
 } from '../styles/StyledComponents';
 import styled from 'styled-components';
 
-// New styled components for the top section
+// New styled components
 const TopSection = styled.div`
   display: flex;
   justify-content: space-between;
@@ -30,6 +28,22 @@ const TopSection = styled.div`
   margin-bottom: 20px;
   flex-wrap: wrap;
   gap: 10px;
+`;
+
+const PageTitle = styled.h1`
+  margin: 0;
+  font-size: 1.5rem;
+  color: #333;
+  
+  @media (min-width: 768px) {
+    font-size: 1.8rem;
+  }
+`;
+
+const ActionButtonContainer = styled.div`
+  display: flex;
+  gap: 10px;
+  align-items: center;
 `;
 
 /**
@@ -155,6 +169,13 @@ const ProductsPage = () => {
       await fetchProducts(); // Refresh product list
       setSuccessMessage('Product deleted successfully!');
       
+      // If we're editing this product, reset the form
+      if (selectedProduct && selectedProduct.product_id === productId) {
+        setSelectedProduct(null);
+        setView('add');
+        setShowForm(false);
+      }
+      
       // Clear success message after delay
       setTimeout(() => {
         setSuccessMessage('');
@@ -169,12 +190,16 @@ const ProductsPage = () => {
    * Handle "Add New Product" button click
    */
   const handleAddNewClick = () => {
-    setView('add');
+    // Reset to initial state for adding a new product
     setSelectedProduct(null);
+    setView('add');
     setShowForm(true);
     setError('');
+    
     // Scroll to top to show form
     window.scrollTo(0, 0);
+    
+    console.log("Add New Product clicked - form state:", { view: 'add', showForm: true, selectedProduct: null });
   };
   
   /**
@@ -183,6 +208,7 @@ const ProductsPage = () => {
    */
   const handleEditClick = (product) => {
     console.log("Edit product clicked:", product);
+    
     // Make a deep copy of the product to avoid reference issues
     const productToEdit = { ...product };
     
@@ -252,6 +278,7 @@ const ProductsPage = () => {
         {/* Product Form - only shown when showForm is true */}
         {showForm && (
           <ProductForm 
+            key={view === 'edit' ? `edit-${selectedProduct?.product_id}` : 'add-form'}
             formType={view} 
             product={selectedProduct} 
             onSubmit={handleFormSubmit} 

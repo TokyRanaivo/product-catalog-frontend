@@ -1,4 +1,4 @@
-// src/components/ProductForm.jsx - Updated with better visual cues for edit mode
+// src/components/ProductForm.jsx - Fixed version for input interaction issues
 import { useState, useEffect } from 'react';
 import { getImages } from '../services/api';
 import { useForm } from 'react-hook-form';
@@ -75,8 +75,6 @@ const EditModeIndicator = styled.div`
  * @param {Function} props.onCancel - Cancel handler function
  */
 const ProductForm = ({ formType = 'add', product = {}, onSubmit, onCancel }) => {
-  console.log(`ProductForm rendering with formType: ${formType}, product:`, product);
-  
   // Ensure product is an object even if null is passed
   const safeProduct = product || {};
   
@@ -100,11 +98,11 @@ const ProductForm = ({ formType = 'add', product = {}, onSubmit, onCancel }) => 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   
-  // Reset form values when product changes
+  // Reset form values when product changes or form type changes
   useEffect(() => {
-    console.log("Product changed in ProductForm:", safeProduct);
+    console.log("Product or formType changed, resetting form", { formType, product: safeProduct });
     
-    // Reset the form with the new product data
+    // Reset the form with the product data or empty values for new product
     reset({
       prod_name: safeProduct.prod_name || '',
       price: safeProduct.price || '',
@@ -116,7 +114,7 @@ const ProductForm = ({ formType = 'add', product = {}, onSubmit, onCancel }) => 
     // Update the preview URL
     setPreviewURL(safeProduct.imageURL || '');
     
-  }, [safeProduct, reset]);
+  }, [safeProduct, formType, reset]);
   
   // Update preview when imageURL changes
   useEffect(() => {
@@ -134,7 +132,7 @@ const ProductForm = ({ formType = 'add', product = {}, onSubmit, onCancel }) => 
     
     try {
       const imagesList = await getImages();
-      setImages(imagesList);
+      setImages(imagesList || []);
       setShowImageSelector(true);
     } catch (err) {
       console.error('Error fetching images:', err);
@@ -149,9 +147,11 @@ const ProductForm = ({ formType = 'add', product = {}, onSubmit, onCancel }) => 
    * @param {Object} image - Image object with imageID and imageURL
    */
   const selectImage = (image) => {
-    setValue('imageURL', image.imageURL);
-    setValue('imageID', image.imageID);
-    setPreviewURL(image.imageURL);
+    console.log("Image selected:", image);
+    setValue('imageURL', image.imageURL || '');
+    setValue('imageID', image.imageID || '');
+    setPreviewURL(image.imageURL || '');
+    // No need to close image selector automatically, let user do it
   };
   
   /**
@@ -166,6 +166,8 @@ const ProductForm = ({ formType = 'add', product = {}, onSubmit, onCancel }) => 
    * @param {Object} data - Form data
    */
   const submitForm = (data) => {
+    console.log("Form submitted with data:", data);
+    
     // Convert price to number
     const formattedData = {
       ...data,
@@ -176,13 +178,20 @@ const ProductForm = ({ formType = 'add', product = {}, onSubmit, onCancel }) => 
     onSubmit(formattedData);
   };
   
+  /**
+   * Handle form input change (for debugging)
+   */
+  const handleInputChange = (e) => {
+    console.log(`Input changed: ${e.target.name} = ${e.target.value}`);
+  };
+  
   return (
     <FormContainer style={formType === 'edit' ? { borderColor: '#ffc107', borderWidth: '2px' } : {}}>
       <FormTitle>
         {formType === 'add' ? 'Add New Product' : 'Edit Product'}
       </FormTitle>
       
-      {formType === 'edit' && (
+      {formType === 'edit' && safeProduct.prod_name && (
         <EditModeIndicator>
           You are editing the product "{safeProduct.prod_name}". Changes will be saved when you click "Save Changes".
         </EditModeIndicator>
@@ -194,6 +203,7 @@ const ProductForm = ({ formType = 'add', product = {}, onSubmit, onCancel }) => 
           <FormInput
             id="prod_name"
             error={errors.prod_name}
+            onChange={handleInputChange}
             {...register('prod_name', { 
               required: 'Product name is required',
               minLength: { value: 2, message: 'Name must be at least 2 characters' }
@@ -209,6 +219,7 @@ const ProductForm = ({ formType = 'add', product = {}, onSubmit, onCancel }) => 
             type="number"
             step="0.01"
             error={errors.price}
+            onChange={handleInputChange}
             {...register('price', { 
               required: 'Price is required',
               min: { value: 0.01, message: 'Price must be greater than 0' },
@@ -223,6 +234,7 @@ const ProductForm = ({ formType = 'add', product = {}, onSubmit, onCancel }) => 
           <FormTextarea
             id="description"
             error={errors.description}
+            onChange={handleInputChange}
             {...register('description', { 
               required: 'Description is required',
               minLength: { value: 10, message: 'Description must be at least 10 characters' }
@@ -236,6 +248,7 @@ const ProductForm = ({ formType = 'add', product = {}, onSubmit, onCancel }) => 
           <FormInput
             id="imageURL"
             error={errors.imageURL}
+            onChange={handleInputChange}
             {...register('imageURL', { 
               required: 'Image URL is required',
               pattern: { 
@@ -277,19 +290,23 @@ const ProductForm = ({ formType = 'add', product = {}, onSubmit, onCancel }) => 
             </ImageSelectorHeader>
             
             <ImageGrid>
-              {images.map(image => (
-                <img
-                  key={image.imageID}
-                  src={image.imageURL}
-                  alt="Select this image"
-                  className={parseInt(watchImageID) === image.imageID ? 'selected' : ''}
-                  onClick={() => selectImage(image)}
-                  onError={(e) => {
-                    e.target.onerror = null;
-                    e.target.src = '/images/no_image.jpg';
-                  }}
-                />
-              ))}
+              {images && images.length > 0 ? (
+                images.map(image => (
+                  <img
+                    key={image.imageID}
+                    src={image.imageURL}
+                    alt="Select this image"
+                    className={parseInt(watchImageID) === image.imageID ? 'selected' : ''}
+                    onClick={() => selectImage(image)}
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = '/images/no_image.jpg';
+                    }}
+                  />
+                ))
+              ) : (
+                <div>No images available. Upload images first.</div>
+              )}
             </ImageGrid>
           </ImageSelector>
         )}
