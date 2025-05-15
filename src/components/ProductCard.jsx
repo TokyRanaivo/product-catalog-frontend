@@ -1,4 +1,4 @@
-// src/components/ProductCard.jsx - Card for displaying a product
+// src/components/ProductCard.jsx
 import { FaEdit, FaTrash } from 'react-icons/fa';
 import {
   ProductCard as Card,
@@ -20,12 +20,27 @@ import {
  * @param {Function} props.onDelete - Function to call when delete button is clicked
  */
 const ProductCard = ({ product, onEdit, onDelete }) => {
+  // Check for null or undefined product
+  if (!product) {
+    console.error('ProductCard received null or undefined product');
+    return null;
+  }
+  
+  // Safely access product properties
+  const {
+    product_id,
+    prod_name = 'Unnamed Product',
+    price = 0,
+    description = 'No description available.',
+    imageURL = '/images/no_image.jpg'
+  } = product;
+  
   return (
     <Card>
       <ProductImageContainer>
         <ProductImage 
-          src={product.imageURL || '/images/no_image.jpg'} 
-          alt={product.prod_name}
+          src={imageURL || '/images/no_image.jpg'} 
+          alt={prod_name}
           onError={(e) => {
             e.target.onerror = null;
             e.target.src = '/images/no_image.jpg';
@@ -34,11 +49,11 @@ const ProductCard = ({ product, onEdit, onDelete }) => {
       </ProductImageContainer>
       
       <ProductContent>
-        <ProductTitle>{product.prod_name}</ProductTitle>
-        <ProductPrice>${parseFloat(product.price).toFixed(2)}</ProductPrice>
+        <ProductTitle>{prod_name}</ProductTitle>
+        <ProductPrice>${parseFloat(price).toFixed(2)}</ProductPrice>
         
         <ProductDescription>
-          {product.description || 'No description available.'}
+          {description}
         </ProductDescription>
         
         <ProductActions>
@@ -52,7 +67,7 @@ const ProductCard = ({ product, onEdit, onDelete }) => {
           
           <IconButton 
             color="#dc3545" 
-            onClick={() => onDelete(product.product_id)}
+            onClick={() => onDelete(product_id)}
             title="Delete product"
           >
             <FaTrash />

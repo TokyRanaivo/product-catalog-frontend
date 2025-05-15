@@ -1,5 +1,5 @@
-// src/pages/LoginPage.jsx - Login page
-import { useState, useContext } from 'react';
+// src/pages/LoginPage.jsx
+import { useState, useContext, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { login } from '../services/api';
@@ -13,7 +13,9 @@ import {
   FormInput,
   Button,
   ErrorMessage,
-  Alert
+  Alert,
+  LoadingContainer,
+  Spinner
 } from '../styles/StyledComponents';
 
 /**
@@ -23,20 +25,35 @@ const LoginPage = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const { register, handleSubmit, formState: { errors } } = useForm();
-  const { login: authLogin } = useContext(AuthContext);
+  const { login: authLogin, isAuthenticated } = useContext(AuthContext);
   const navigate = useNavigate();
+
+  // Check if user is already authenticated
+  useEffect(() => {
+    console.log("LoginPage: Checking if already authenticated");
+    if (isAuthenticated()) {
+      console.log("User already authenticated, redirecting to home");
+      navigate('/');
+    }
+  }, [isAuthenticated, navigate]);
 
   /**
    * Handle form submission
    * @param {Object} data - Form data
    */
   const handleLogin = async (data) => {
+    console.log("Login form submitted");
     setLoading(true);
     setError('');
     
     try {
       // Call login API
       const response = await login(data);
+      console.log("Login successful, response:", response);
+      
+      if (!response.token || !response.user) {
+        throw new Error('Invalid response from server. Missing token or user data.');
+      }
       
       // Store user data and token
       authLogin(response.user, response.token);

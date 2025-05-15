@@ -1,3 +1,4 @@
+// src/components/ProductForm.jsx
 import { useState, useEffect } from 'react';
 import { getImages } from '../services/api';
 import { useForm } from 'react-hook-form';
@@ -64,21 +65,24 @@ const ImageSelectorHeader = styled.div`
  * @param {Function} props.onCancel - Cancel handler function
  */
 const ProductForm = ({ formType = 'add', product = {}, onSubmit, onCancel }) => {
+  // Ensure product is an object even if null is passed
+  const safeProduct = product || {};
+  
   // Setup react-hook-form with validation
   const { register, handleSubmit, watch, formState: { errors }, setValue } = useForm({
     defaultValues: {
-      prod_name: product.prod_name || '',
-      price: product.price || '',
-      description: product.description || '',
-      imageURL: product.imageURL || '',
-      imageID: product.imageID || ''
+      prod_name: safeProduct.prod_name || '',
+      price: safeProduct.price || '',
+      description: safeProduct.description || '',
+      imageURL: safeProduct.imageURL || '',
+      imageID: safeProduct.imageID || ''
     }
   });
   
   // Watch the imageURL field for preview
   const watchImageURL = watch('imageURL');
   const watchImageID = watch('imageID');
-  const [previewURL, setPreviewURL] = useState(product.imageURL || '');
+  const [previewURL, setPreviewURL] = useState(safeProduct.imageURL || '');
   const [images, setImages] = useState([]);
   const [showImageSelector, setShowImageSelector] = useState(false);
   const [loading, setLoading] = useState(false);

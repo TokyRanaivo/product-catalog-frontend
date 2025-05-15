@@ -6,6 +6,8 @@ import ProductsPage from './pages/ProductsPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import './App.css';
+import './debug';
+
 
 /**
  * Main application component

@@ -1,4 +1,4 @@
-// src/pages/ProductsPage.jsx - Main products page with CRUD functionality
+// src/pages/ProductsPage.jsx
 import { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
@@ -14,7 +14,9 @@ import Header from '../components/Header';
 import { 
   Container, 
   Alert,
-  Button
+  Button,
+  LoadingContainer,
+  Spinner
 } from '../styles/StyledComponents';
 
 /**
@@ -31,18 +33,26 @@ const ProductsPage = () => {
   const [selectedProduct, setSelectedProduct] = useState(null);
   
   // Authentication context
-  const { isAuthenticated } = useContext(AuthContext);
+  const { user, isAuthenticated } = useContext(AuthContext);
   const navigate = useNavigate();
+  
+  // Add debug info
+  console.log("ProductsPage rendering:", { user, isAuthenticated: isAuthenticated(), loading });
   
   // Check authentication on mount
   useEffect(() => {
+    console.log("Checking authentication:", user);
     if (!isAuthenticated()) {
+      console.log("Not authenticated, redirecting to login");
       navigate('/login');
+    } else {
+      console.log("User is authenticated:", user);
     }
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated, navigate, user]);
   
   // Fetch products on mount
   useEffect(() => {
+    console.log("Fetching products...");
     fetchProducts();
   }, []);
   
@@ -54,8 +64,10 @@ const ProductsPage = () => {
     setError('');
     
     try {
+      console.log("Making API call to fetch products");
       const data = await getProducts();
-      setProducts(data);
+      console.log("Products fetched:", data);
+      setProducts(data || []); // Ensure we always set an array even if null is returned
     } catch (err) {
       console.error('Error fetching products:', err);
       setError('Failed to load products. Please try again.');
@@ -70,6 +82,7 @@ const ProductsPage = () => {
    */
   const handleAddProduct = async (data) => {
     try {
+      console.log("Adding product:", data);
       await createProduct(data);
       await fetchProducts(); // Refresh product list
       setSuccessMessage('Product added successfully!');
@@ -90,6 +103,11 @@ const ProductsPage = () => {
    */
   const handleUpdateProduct = async (data) => {
     try {
+      if (!selectedProduct || !selectedProduct.product_id) {
+        throw new Error('No product selected for update');
+      }
+      
+      console.log("Updating product:", data);
       await updateProduct(selectedProduct.product_id, data);
       await fetchProducts(); // Refresh product list
       setView('add'); // Reset to add mode
@@ -116,6 +134,7 @@ const ProductsPage = () => {
     }
     
     try {
+      console.log("Deleting product:", productId);
       await deleteProduct(productId);
       await fetchProducts(); // Refresh product list
       setSuccessMessage('Product deleted successfully!');
@@ -135,6 +154,7 @@ const ProductsPage = () => {
    * @param {Object} product - Product to edit
    */
   const handleEditClick = (product) => {
+    console.log("Edit product clicked:", product);
     setSelectedProduct(product);
     setView('edit');
     // Scroll to top to show form
@@ -152,6 +172,21 @@ const ProductsPage = () => {
   
   // Form submission handler based on view
   const handleFormSubmit = view === 'add' ? handleAddProduct : handleUpdateProduct;
+  
+  // Show loading state
+  if (loading) {
+    return (
+      <>
+        <Header />
+        <Container>
+          <LoadingContainer>
+            <Spinner size="40px" />
+            <p>Loading products...</p>
+          </LoadingContainer>
+        </Container>
+      </>
+    );
+  }
   
   return (
     <>
