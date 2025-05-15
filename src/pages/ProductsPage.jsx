@@ -37,7 +37,7 @@ const ProductsPage = () => {
   const navigate = useNavigate();
   
   // Add debug info
-  console.log("ProductsPage rendering:", { user, isAuthenticated: isAuthenticated(), loading });
+  console.log("ProductsPage rendering:", { user, isAuthenticated: isAuthenticated(), loading, view, selectedProduct });
   
   // Check authentication on mount
   useEffect(() => {
@@ -155,8 +155,20 @@ const ProductsPage = () => {
    */
   const handleEditClick = (product) => {
     console.log("Edit product clicked:", product);
-    setSelectedProduct(product);
+    // Make a deep copy of the product to avoid reference issues
+    const productToEdit = { ...product };
+    
+    // Make sure all fields are present even if they are empty
+    productToEdit.prod_name = productToEdit.prod_name || '';
+    productToEdit.price = productToEdit.price || '';
+    productToEdit.description = productToEdit.description || '';
+    productToEdit.imageURL = productToEdit.imageURL || '';
+    productToEdit.imageID = productToEdit.imageID || '';
+    
+    console.log("Setting selected product for edit:", productToEdit);
+    setSelectedProduct(productToEdit);
     setView('edit');
+    
     // Scroll to top to show form
     window.scrollTo(0, 0);
   };

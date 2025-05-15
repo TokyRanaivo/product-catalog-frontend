@@ -1,4 +1,4 @@
-// src/components/ProductForm.jsx
+// src/components/ProductForm.jsx - Form for adding/editing products
 import { useState, useEffect } from 'react';
 import { getImages } from '../services/api';
 import { useForm } from 'react-hook-form';
@@ -65,11 +65,13 @@ const ImageSelectorHeader = styled.div`
  * @param {Function} props.onCancel - Cancel handler function
  */
 const ProductForm = ({ formType = 'add', product = {}, onSubmit, onCancel }) => {
+  console.log(`ProductForm rendering with formType: ${formType}, product:`, product);
+  
   // Ensure product is an object even if null is passed
   const safeProduct = product || {};
   
   // Setup react-hook-form with validation
-  const { register, handleSubmit, watch, formState: { errors }, setValue } = useForm({
+  const { register, handleSubmit, watch, formState: { errors }, setValue, reset } = useForm({
     defaultValues: {
       prod_name: safeProduct.prod_name || '',
       price: safeProduct.price || '',
@@ -87,6 +89,24 @@ const ProductForm = ({ formType = 'add', product = {}, onSubmit, onCancel }) => 
   const [showImageSelector, setShowImageSelector] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  
+  // Reset form values when product changes
+  useEffect(() => {
+    console.log("Product changed in ProductForm:", safeProduct);
+    
+    // Reset the form with the new product data
+    reset({
+      prod_name: safeProduct.prod_name || '',
+      price: safeProduct.price || '',
+      description: safeProduct.description || '',
+      imageURL: safeProduct.imageURL || '',
+      imageID: safeProduct.imageID || ''
+    });
+    
+    // Update the preview URL
+    setPreviewURL(safeProduct.imageURL || '');
+    
+  }, [safeProduct, reset]);
   
   // Update preview when imageURL changes
   useEffect(() => {
