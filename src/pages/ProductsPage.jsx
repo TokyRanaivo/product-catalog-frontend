@@ -14,10 +14,23 @@ import Header from '../components/Header';
 import { 
   Container, 
   Alert,
-  Button,
   LoadingContainer,
-  Spinner
+  Spinner,
+  Button,
+  PageTitle,
+  ActionButtonContainer
 } from '../styles/StyledComponents';
+import styled from 'styled-components';
+
+// New styled components for the top section
+const TopSection = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 10px;
+`;
 
 /**
  * Main page component for product management
@@ -29,6 +42,7 @@ const ProductsPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
+  const [showForm, setShowForm] = useState(false);
   const [view, setView] = useState('add'); // 'add' or 'edit'
   const [selectedProduct, setSelectedProduct] = useState(null);
   
@@ -37,7 +51,7 @@ const ProductsPage = () => {
   const navigate = useNavigate();
   
   // Add debug info
-  console.log("ProductsPage rendering:", { user, isAuthenticated: isAuthenticated(), loading, view, selectedProduct });
+  console.log("ProductsPage rendering:", { user, isAuthenticated: isAuthenticated(), loading, view, selectedProduct, showForm });
   
   // Check authentication on mount
   useEffect(() => {
@@ -86,6 +100,7 @@ const ProductsPage = () => {
       await createProduct(data);
       await fetchProducts(); // Refresh product list
       setSuccessMessage('Product added successfully!');
+      setShowForm(false); // Hide the form after successful submission
       
       // Clear success message after delay
       setTimeout(() => {
@@ -112,6 +127,7 @@ const ProductsPage = () => {
       await fetchProducts(); // Refresh product list
       setView('add'); // Reset to add mode
       setSelectedProduct(null);
+      setShowForm(false); // Hide the form after successful update
       setSuccessMessage('Product updated successfully!');
       
       // Clear success message after delay
@@ -150,6 +166,18 @@ const ProductsPage = () => {
   };
   
   /**
+   * Handle "Add New Product" button click
+   */
+  const handleAddNewClick = () => {
+    setView('add');
+    setSelectedProduct(null);
+    setShowForm(true);
+    setError('');
+    // Scroll to top to show form
+    window.scrollTo(0, 0);
+  };
+  
+  /**
    * Handle edit button click
    * @param {Object} product - Product to edit
    */
@@ -168,6 +196,7 @@ const ProductsPage = () => {
     console.log("Setting selected product for edit:", productToEdit);
     setSelectedProduct(productToEdit);
     setView('edit');
+    setShowForm(true);
     
     // Scroll to top to show form
     window.scrollTo(0, 0);
@@ -179,6 +208,7 @@ const ProductsPage = () => {
   const handleCancel = () => {
     setView('add');
     setSelectedProduct(null);
+    setShowForm(false);
     setError('');
   };
   
@@ -207,20 +237,29 @@ const ProductsPage = () => {
         {error && <Alert type="danger">{error}</Alert>}
         {successMessage && <Alert type="success">{successMessage}</Alert>}
         
-        {/* Product Form */}
-        <ProductForm 
-          formType={view} 
-          product={selectedProduct} 
-          onSubmit={handleFormSubmit} 
-          onCancel={handleCancel} 
-        />
+        {/* Top section with title and add button */}
+        <TopSection>
+          <PageTitle>Product Catalog</PageTitle>
+          <ActionButtonContainer>
+            {!showForm && (
+              <Button onClick={handleAddNewClick}>
+                Add New Product
+              </Button>
+            )}
+          </ActionButtonContainer>
+        </TopSection>
+        
+        {/* Product Form - only shown when showForm is true */}
+        {showForm && (
+          <ProductForm 
+            formType={view} 
+            product={selectedProduct} 
+            onSubmit={handleFormSubmit} 
+            onCancel={handleCancel} 
+          />
+        )}
         
         {/* Product List */}
-        <h2>Products</h2>
-        <Button onClick={fetchProducts} marginRight>
-          Refresh Products
-        </Button>
-        
         <ProductList
           products={products}
           loading={loading}

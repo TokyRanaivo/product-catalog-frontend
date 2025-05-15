@@ -15,17 +15,40 @@ body {
   line-height: 1.6;
 }
 
+/* Better typography for larger screens */
+@media (min-width: 768px) {
+  body {
+    font-size: 16px;
+  }
+  
+  h1 {
+    font-size: 2.5rem;
+  }
+  
+  h2 {
+    font-size: 2rem;
+  }
+  
+  h3 {
+    font-size: 1.75rem;
+  }
+}
+
 a {
   color: #007bff;
   text-decoration: none;
+  transition: color 0.2s ease;
 }
 
 a:hover {
+  color: #0056b3;
   text-decoration: underline;
 }
 
 h1, h2, h3, h4, h5, h6 {
   margin-bottom: 15px;
+  font-weight: 600;
+  line-height: 1.2;
 }
 
 p {
@@ -52,3 +75,29 @@ input[type="file"] {
 .mb-2 { margin-bottom: 20px; }
 .text-center { text-align: center; }
 .text-right { text-align: right; }
+
+/* Responsive container for all pages */
+.app-container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 15px;
+}
+
+@media (min-width: 768px) {
+  .app-container {
+    padding: 0 30px;
+  }
+}
+
+/* More breathing room for larger screens */
+@media (min-width: 992px) {
+  h1, h2, h3, h4, h5, h6 {
+    margin-bottom: 20px;
+  }
+  
+  .mb-1 { margin-bottom: 15px; }
+  .mb-2 { margin-bottom: 30px; }
+  .mt-1 { margin-top: 15px; }
+  .mt-2 { margin-top: 30px; }
+}

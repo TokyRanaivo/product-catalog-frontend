@@ -1,11 +1,16 @@
-// src/styles/StyledComponents.js - Styled components for UI
+// src/styles/StyledComponents.js - Updated styles for better responsiveness
 import styled from 'styled-components';
 
 // Container for centering content
 export const Container = styled.div`
+  width: 100%;
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 20px;
+  
+  @media (min-width: 768px) {
+    padding: 0 40px;
+  }
 `;
 
 // Page header
@@ -13,16 +18,26 @@ export const PageHeader = styled.header`
   background-color: #f8f9fa;
   padding: 20px;
   display: flex;
+  flex-direction: column;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 30px;
   border-bottom: 1px solid #e1e1e1;
+  
+  @media (min-width: 768px) {
+    flex-direction: row;
+  }
 `;
 
 // Navigation links
 export const NavLinks = styled.div`
   display: flex;
   gap: 15px;
+  margin-top: 10px;
+
+  @media (min-width: 768px) {
+    margin-top: 0;
+  }
 
   a {
     text-decoration: none;
@@ -34,31 +49,36 @@ export const NavLinks = styled.div`
   }
 `;
 
-// Page title
-export const PageTitle = styled.h1`
-  margin: 0;
-  font-size: 1.8rem;
-  color: #333;
-`;
 
 // Form container
 export const FormContainer = styled.div`
-  max-width: 600px;
-  margin: 0 auto;
+  width: 100%;
+  margin: 0 auto 30px auto;
   padding: 20px;
   background-color: #fff;
   border: 1px solid #e1e1e1;
   border-radius: 5px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  margin-bottom: 30px;
+  
+  @media (min-width: 768px) {
+    max-width: 80%;
+  }
+  
+  @media (min-width: 992px) {
+    max-width: 70%;
+  }
 `;
 
 // Form title
 export const FormTitle = styled.h2`
   margin-top: 0;
   margin-bottom: 20px;
-  font-size: 1.5rem;
+  font-size: 1.3rem;
   color: #333;
+  
+  @media (min-width: 768px) {
+    font-size: 1.5rem;
+  }
 `;
 
 // Form group
@@ -146,9 +166,17 @@ export const DangerButton = styled(Button)`
 // Product grid
 export const ProductGrid = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 20px;
   margin-top: 20px;
+  
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  }
+  
+  @media (min-width: 1200px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
 `;
 
 // Product card
@@ -158,7 +186,10 @@ export const ProductCard = styled.div`
   border-radius: 5px;
   overflow: hidden;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
   
   &:hover {
     transform: translateY(-5px);
@@ -172,6 +203,10 @@ export const ProductImageContainer = styled.div`
   height: 200px;
   overflow: hidden;
   position: relative;
+  
+  @media (min-width: 768px) {
+    height: 250px;
+  }
 `;
 
 // Product image
@@ -179,11 +214,19 @@ export const ProductImage = styled.img`
   width: 100%;
   height: 100%;
   object-fit: cover;
+  transition: transform 0.3s ease;
+  
+  ${ProductCard}:hover & {
+    transform: scale(1.05);
+  }
 `;
 
 // Product content
 export const ProductContent = styled.div`
   padding: 15px;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
 `;
 
 // Product title
@@ -191,6 +234,10 @@ export const ProductTitle = styled.h3`
   margin: 0 0 10px 0;
   font-size: 1.2rem;
   color: #333;
+  
+  @media (min-width: 768px) {
+    font-size: 1.4rem;
+  }
 `;
 
 // Product price
@@ -199,6 +246,10 @@ export const ProductPrice = styled.p`
   color: #007bff;
   font-size: 1.1rem;
   margin: 0 0 10px 0;
+  
+  @media (min-width: 768px) {
+    font-size: 1.2rem;
+  }
 `;
 
 // Product description
@@ -206,6 +257,11 @@ export const ProductDescription = styled.p`
   color: #666;
   margin: 0 0 15px 0;
   font-size: 0.9rem;
+  flex-grow: 1;
+  
+  @media (min-width: 768px) {
+    font-size: 1rem;
+  }
 `;
 
 // Product actions
@@ -214,12 +270,6 @@ export const ProductActions = styled.div`
   justify-content: space-between;
   align-items: center;
   margin-top: 10px;
-`;
-
-// Action button container
-export const ActionButtonContainer = styled.div`
-  display: flex;
-  gap: 10px;
 `;
 
 // Icon button
@@ -233,6 +283,7 @@ export const IconButton = styled.button`
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: color 0.2s ease, transform 0.2s ease;
   
   &:hover {
     color: ${props => {
@@ -240,6 +291,7 @@ export const IconButton = styled.button`
       if (props.color === '#6c757d') return '#5a6268';
       return '#0069d9';
     }};
+    transform: scale(1.1);
   }
 `;
 
@@ -276,41 +328,31 @@ export const PreviewImage = styled.img`
   margin: 10px 0;
   border: 1px solid #ced4da;
   border-radius: 4px;
-`;
-
-// Image selector
-export const ImageSelector = styled.div`
-  margin-top: 15px;
-  border: 1px solid #ced4da;
-  border-radius: 4px;
-  padding: 15px;
-  background-color: #f8f9fa;
-`;
-
-export const ImageGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-  gap: 10px;
-  margin: 15px 0;
   
-  img {
-    width: 100%;
-    height: 100px;
-    object-fit: cover;
-    border: 2px solid transparent;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: border-color 0.2s ease;
-    
-    &:hover {
-      border-color: #007bff;
-    }
-    
-    &.selected {
-      border-color: #007bff;
-    }
+  @media (min-width: 768px) {
+    max-height: 300px;
   }
 `;
+
+// Action button container
+export const ActionButtonContainer = styled.div`
+  display: flex;
+  gap: 10px;
+  align-items: center;
+`;
+
+// Page title
+export const PageTitle = styled.h1`
+  margin: 0;
+  font-size: 1.5rem;
+  color: #333;
+  
+  @media (min-width: 768px) {
+    font-size: 1.8rem;
+  }
+`;
+
+
 // Loading spinner
 export const Spinner = styled.div`
   display: inline-block;
@@ -330,7 +372,9 @@ export const Spinner = styled.div`
 // Loading container
 export const LoadingContainer = styled.div`
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   min-height: 200px;
+  gap: 20px;
 `;

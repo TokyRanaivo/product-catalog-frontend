@@ -1,4 +1,4 @@
-// src/components/Header.jsx - Header component with navigation
+// src/components/Header.jsx - Header component with improved responsive design
 import { useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { PageHeader, PageTitle, NavLinks, Button } from '../styles/StyledComponents';

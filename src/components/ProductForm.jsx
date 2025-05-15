@@ -1,4 +1,4 @@
-// src/components/ProductForm.jsx - Form for adding/editing products
+// src/components/ProductForm.jsx - Updated with better visual cues for edit mode
 import { useState, useEffect } from 'react';
 import { getImages } from '../services/api';
 import { useForm } from 'react-hook-form';
@@ -54,6 +54,16 @@ const ImageSelectorHeader = styled.div`
   justify-content: space-between;
   align-items: center;
   margin-bottom: 10px;
+`;
+
+// New styled component for edit mode
+const EditModeIndicator = styled.div`
+  background-color: #fff3cd;
+  color: #856404;
+  padding: 10px;
+  border-radius: 4px;
+  margin-bottom: 15px;
+  border: 1px solid #ffeeba;
 `;
 
 /**
@@ -167,10 +177,16 @@ const ProductForm = ({ formType = 'add', product = {}, onSubmit, onCancel }) => 
   };
   
   return (
-    <FormContainer>
+    <FormContainer style={formType === 'edit' ? { borderColor: '#ffc107', borderWidth: '2px' } : {}}>
       <FormTitle>
         {formType === 'add' ? 'Add New Product' : 'Edit Product'}
       </FormTitle>
+      
+      {formType === 'edit' && (
+        <EditModeIndicator>
+          You are editing the product "{safeProduct.prod_name}". Changes will be saved when you click "Save Changes".
+        </EditModeIndicator>
+      )}
       
       <form onSubmit={handleSubmit(submitForm)}>
         <FormGroup>
